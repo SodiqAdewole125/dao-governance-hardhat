@@ -21,7 +21,7 @@ describe("Dao", function () {
      
     })
 
-    it("", async function (){
+    it("should vote by single choice", async function (){
         const title:string = "This is the title"
         const description:string = "This is the description"
         const proposalType:number = 0
@@ -56,16 +56,8 @@ describe("Dao", function () {
         const proposalCreated = receipt.events?.filter((x) => {return x.event == "ProposalCreated"});
         const proposalArgs  = proposalCreated?.[0].args;
 
-        console.log(proposalArgs?.length)
-        // const proposalCreated = result.events[result.events.length - 1]
-        // const args = proposalCreated.args;
-        // console.log(args)
-        // console.log(proposalCreated)
-
-
         const currentProposal = await dao.proposals(1);
         const currentProposalOptions =  await dao.getOptions(currentProposal[0])
-        // console.log(currentProposalOptions)
         const currentProposalVoters=  await dao.getVoters(currentProposal[0])
 
     })
