@@ -54,9 +54,9 @@ describe("Dao", function () {
 
         const receipt: ContractReceipt = await daoTx.wait();
         const proposalCreated = receipt.events?.filter((x) => {return x.event == "ProposalCreated"});
-        const proposalArgs  = proposalCreated[0].args;
+        const proposalArgs  = proposalCreated?.[0].args;
 
-        console.log(proposalArgs)
+        console.log(proposalArgs?.length)
         // const proposalCreated = result.events[result.events.length - 1]
         // const args = proposalCreated.args;
         // console.log(args)
