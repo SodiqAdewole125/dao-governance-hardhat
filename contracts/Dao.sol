@@ -213,6 +213,7 @@ contract Dao is ReentrancyGuard {
         larToken.transferFrom(msg.sender, address(this), votingPower);
 
         proposals[id].options[index].vote += votingPower;
+        proposals[id].voters.push(msg.sender);
     }
 
     function voteByWeighing(
