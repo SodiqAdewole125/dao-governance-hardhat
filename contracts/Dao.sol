@@ -3,6 +3,7 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "hardhat/console.sol";
 
 /*
 createQuadraticProposal()
@@ -132,6 +133,8 @@ contract Dao is ReentrancyGuard {
 
         for (uint256 i = 0; i < _options.length; i++) {
             Option memory currentOption = _options[i];
+            console.log("x");
+            // console.log("This is the current option: ", currentOption.optionText);
             proposal.options.push(currentOption);
         }
 
@@ -146,6 +149,14 @@ contract Dao is ReentrancyGuard {
             _duration,
             _options
         );
+    }
+
+    function getOptions(uint256 id) external view returns (Option[] memory) {
+        return proposals[id].options;
+    }
+
+    function getVoters(uint256 id) external view returns (address[] memory) {
+        return proposals[id].voters;
     }
 
     function voteProposalByQuadratic(
