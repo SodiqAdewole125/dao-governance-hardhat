@@ -104,6 +104,16 @@ contract Dao is ReentrancyGuard {
 
         proposalId++;
 
+        Proposal storage proposal = proposals[proposalId];
+        proposal.id = proposalId;
+        proposal.creator = msg.sender;
+        proposal.title = _title;
+        proposal.description = _description;
+        proposal.proposalType = proposalType;
+        proposal.proposalStatus = proposalStatus;
+        proposal.startDate = _startDate;
+        proposal.duration = _duration;
+
         // Proposal memory proposal = Proposal({
         //     id: proposalId,
         //     creator: msg.sender,
@@ -113,16 +123,16 @@ contract Dao is ReentrancyGuard {
         //     proposalStatus: proposalStatus,
         //     startDate: _startDate,
         //     duration: _duration,
-        //     options: new Option[](0),
+        //     options:  ,
         //     voters: new address[](0)
         // });
-        Proposal memory proposal = Proposal( proposalId,  msg.sender,  _title,  _description,  proposalType,  proposalStatus,  _startDate,  _duration);
+        // Proposal memory proposal = Proposal( proposalId,  msg.sender,  _title,  _description,  proposalType,  proposalStatus,  _startDate,  _duration);
 
-        proposals[proposalId] = proposal;
+        // proposals[proposalId] = proposal;
 
-        for (uint i = 0; i < _options.length; i++){
+        for (uint256 i = 0; i < _options.length; i++) {
             Option memory currentOption = _options[i];
-            proposals[proposalId].options.push(currentOption);
+            proposal.options.push(currentOption);
         }
 
         emit ProposalCreated(
@@ -254,7 +264,7 @@ contract Dao is ReentrancyGuard {
         for (uint256 i = 0; i < voters.length; i++) {
             address currentVoter = voters[i];
             if (voter == currentVoter) {
-                return int(i);
+                return int256(i);
             }
         }
         return -1;
