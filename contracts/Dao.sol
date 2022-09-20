@@ -36,6 +36,12 @@ contract Dao is ReentrancyGuard {
         uint256 vote;
     }
 
+    struct Voter {
+        address voterAddress;
+        uint[] optionIndexes;
+        uint[] optionVotes;
+    }
+
     struct Proposal {
         uint256 id;
         address creator;
@@ -46,7 +52,7 @@ contract Dao is ReentrancyGuard {
         uint256 startDate;
         uint256 duration;
         Option[] options;
-        address[] voters;
+        Voter[] voters;
     }
 
     event ProposalCreated(
@@ -115,25 +121,9 @@ contract Dao is ReentrancyGuard {
         proposal.startDate = _startDate;
         proposal.duration = _duration;
 
-        // Proposal memory proposal = Proposal({
-        //     id: proposalId,
-        //     creator: msg.sender,
-        //     title: _title,
-        //     description: _description,
-        //     proposalType: proposalType,
-        //     proposalStatus: proposalStatus,
-        //     startDate: _startDate,
-        //     duration: _duration,
-        //     options:  ,
-        //     voters: new address[](0)
-        // });
-        // Proposal memory proposal = Proposal( proposalId,  msg.sender,  _title,  _description,  proposalType,  proposalStatus,  _startDate,  _duration);
-
-        // proposals[proposalId] = proposal;
 
         for (uint256 i = 0; i < _options.length; i++) {
             Option memory currentOption = _options[i];
-            console.log("x");
             // console.log("This is the current option: ", currentOption.optionText);
             proposal.options.push(currentOption);
         }
@@ -155,7 +145,7 @@ contract Dao is ReentrancyGuard {
         return proposals[id].options;
     }
 
-    function getVoters(uint256 id) external view returns (address[] memory) {
+    function getVoters(uint256 id) external view returns (Voter[] memory) {
         return proposals[id].voters;
     }
 
@@ -164,9 +154,11 @@ contract Dao is ReentrancyGuard {
         uint256[] memory indexes,
         uint256[] memory votingPower
     ) external nonReentrant {
-        uint256 totalVotingPower = getQuadraticTotalVotingPower(votingPower);
+        uint256 totalVotingPower = getTotalVotingPower(votingPower);
         int256 hasVoted = checkVotingStatus(id, msg.sender);
         Proposal memory proposal = proposals[id];
+
+        require(proposal.proposalType == ProposalType.Quadratic, "quadratic voting not allowed for the proposal");
 
         require(
             block.timestamp < proposal.startDate + proposal.duration,
@@ -183,11 +175,23 @@ contract Dao is ReentrancyGuard {
 
         for (uint256 i = 0; i < indexes.length; i++) {
             uint256 currentOptionIndex = indexes[i];
-            uint256 currentOptionVotingPower = indexes[i];
-            options[currentOptionIndex].vote += sqrt(currentOptionVotingPower);
+            uint256 currentOptionVotingPower = votingPower[i];
+            console.log(sqrt(currentOptionVotingPower) * (10**9));
+            options[currentOptionIndex].vote += sqrt(currentOptionVotingPower) * (10**9);
         }
 
-        proposals[id].voters.push(msg.sender);
+        uint[] memory optionVotes = new uint[](votingPower.length);
+        for (uint i = 0; i < votingPower.length; i++){
+            optionVotes[i] = sqrt(votingPower[i]) * (10**9);
+        }
+
+        Voter memory voter = Voter({
+            voterAddress: msg.sender,
+            optionIndexes: indexes,
+            optionVotes: optionVotes
+        });
+
+        proposals[id].voters.push(voter);
 
         emit QuadraticVote(id, msg.sender, options);
     }
@@ -199,6 +203,9 @@ contract Dao is ReentrancyGuard {
     ) external nonReentrant {
         int256 hasVoted = checkVotingStatus(id, msg.sender);
         Proposal memory proposal = proposals[id];
+
+        require(proposal.proposalType == ProposalType.SingleChoice, "single choice voting not allowed for the proposal");
+
 
         require(
             block.timestamp < proposal.startDate + proposal.duration,
@@ -213,17 +220,34 @@ contract Dao is ReentrancyGuard {
         larToken.transferFrom(msg.sender, address(this), votingPower);
 
         proposals[id].options[index].vote += votingPower;
-        proposals[id].voters.push(msg.sender);
+        
+        uint[] memory optionIndex = new uint[](1);
+        optionIndex[0] = index;
+
+        uint[] memory optionVotes = new uint[](1);
+        optionVotes[0] = votingPower;
+
+         Voter memory voter = Voter({
+            voterAddress: msg.sender,
+            optionIndexes: optionIndex,
+            optionVotes: optionVotes
+        });
+
+        proposals[id].voters.push(voter);
+
+        // proposals[id].voters.push(msg.sender);
     }
 
-    function voteByWeighing(
+    function voteProposalByWeighing(
         uint256 id,
         uint256[] memory indexes,
         uint256[] memory votingPower
     ) external nonReentrant {
-        uint256 totalVotingPower = getWeightedTotalVotingPower(votingPower);
+        uint256 totalVotingPower = getTotalVotingPower(votingPower);
         int256 hasVoted = checkVotingStatus(id, msg.sender);
         Proposal memory proposal = proposals[id];
+
+        require(proposal.proposalType == ProposalType.Weighted, "weighted voting not allowed for the proposal");
 
         require(
             block.timestamp < proposal.startDate + proposal.duration,
@@ -240,25 +264,24 @@ contract Dao is ReentrancyGuard {
 
         for (uint256 i = 0; i < indexes.length; i++) {
             uint256 currentOptionIndex = indexes[i];
-            uint256 currentOptionVotingPower = indexes[i];
+            uint256 currentOptionVotingPower = votingPower[i];
             options[currentOptionIndex].vote += currentOptionVotingPower;
         }
 
-        proposals[id].voters.push(msg.sender);
+        // Voter[] voters = proposal.voters
+        Voter memory voter = Voter({
+            voterAddress: msg.sender,
+            optionIndexes: indexes,
+            optionVotes: votingPower
+        });
+
+        proposals[id].voters.push(voter);
+        
 
         emit QuadraticVote(id, msg.sender, options);
     }
 
-    function getQuadraticTotalVotingPower(uint256[] memory votingPower)
-        internal
-        returns (uint256 totalVotingPower)
-    {
-        for (uint256 i = 0; i < votingPower.length; i++) {
-            totalVotingPower += votingPower[i];
-        }
-    }
-
-    function getWeightedTotalVotingPower(uint256[] memory votingPower)
+    function getTotalVotingPower(uint256[] memory votingPower)
         internal
         returns (uint256 totalVotingPower)
     {
@@ -272,9 +295,9 @@ contract Dao is ReentrancyGuard {
         view
         returns (int256)
     {
-        address[] memory voters = proposals[id].voters;
+        Voter[] memory voters = proposals[id].voters;
         for (uint256 i = 0; i < voters.length; i++) {
-            address currentVoter = voters[i];
+            address currentVoter = voters[i].voterAddress;
             if (voter == currentVoter) {
                 return int256(i);
             }

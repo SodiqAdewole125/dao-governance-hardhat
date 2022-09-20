@@ -1,17 +1,17 @@
 import { BigNumber } from "ethers";
 import { ethers }  from "hardhat";
 
-export const toWei =  (value: number) => {
-  return ethers.utils.parseEther(value.toString());
+export const toWei =  (value: number):string => {
+  return ethers.utils.parseEther(value.toString()).toString()
 };
 
-export const fromWei = (amount: BigNumber) => {
+export const fromWei = (amount: BigNumber): string => {
   return ethers.utils.formatEther(amount)
 };
 
 export const fastForwardTheTime = async (valueInSeconds: number) => {
   await ethers.provider.send("evm_increaseTime", [valueInSeconds]);
-  await ethers.provider.send("evm_mine", []) ;
+  await ethers.provider.send("evm_mine",[]) ;
 };
 
 export const now = async () => {
