@@ -12,7 +12,7 @@ const deployLAR: DeployFunction = async function (
   const { deployer } = await getNamedAccounts()
   const chainId: number = network.config.chainId!
 
-  console.log(chainId)
+  console.log(network.name)
 
   log("----------------------------------------------------")
   log("Deploying LAR Token and waiting for confirmations...")
