@@ -34,6 +34,21 @@ const config: HardhatUserConfig = {
       default: 0,
     }
   },
+  etherscan: {
+    apiKey: {
+      polygonMumbai: process.env.POLYGON_API_KEY
+    },
+    customChains: [
+      {
+        network: "mumbai",
+        chainId: 8001,
+        urls: {
+          apiURL: "https://api-testnet.polygonscan.com/api",
+          browserURL: "https://mumbai.polygonscan.com/"
+        }
+      }
+    ]
+  }
 };
 
 export default config;

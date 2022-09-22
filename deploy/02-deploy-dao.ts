@@ -3,6 +3,7 @@ import { DeployFunction } from "hardhat-deploy/types"
 // import verify from "../utils/verify"
 import { networkConfig, developmentChains } from "../helper-hardhat-config"
 import { ethers } from "hardhat"
+import {verify} from "../utils/verify"
 
 const deployDao: DeployFunction = async function (
   hre: HardhatRuntimeEnvironment
@@ -26,12 +27,12 @@ const deployDao: DeployFunction = async function (
     waitConfirmations: networkConfig[network.name].blockConfirmations || 0,
   })
   log(`Dao deployed at ${dao.address}`)
-  // if (
-  //   !developmentChains.includes(network.name) &&
-  //   process.env.ETHERSCAN_API_KEY
-  // ) {
-  //   await verify(dao.address, [ethUsdPriceFeedAddress])
-  // }
+  if (
+    !developmentChains.includes(network.name) &&
+    process.env.POLYGON_API_KEY
+  ) {
+    await verify(dao.address, [lar.address])
+  }
 }
 export default deployDao
 deployDao.tags = ["all", "dao"]

@@ -42,6 +42,7 @@ contract Dao is ReentrancyGuard {
         uint[] optionVotes;
     }
 
+
     struct Proposal {
         uint256 id;
         address creator;
@@ -67,7 +68,11 @@ contract Dao is ReentrancyGuard {
         Option[] options
     );
 
-    event QuadraticVote(uint256 id, address voter, Option[] options);
+
+    event VoteCreated(uint id, uint[] optionVotes, uint[] optionIndexes, address voterAddress, Option[] proposalOptions);
+
+    event Vote(uint256 id, Voter voter, Option[] options);
+    event Testing(uint256 id, address voter);
 
     mapping(uint256 => Proposal) public proposals;
 
@@ -193,7 +198,9 @@ contract Dao is ReentrancyGuard {
 
         proposals[id].voters.push(voter);
 
-        emit QuadraticVote(id, msg.sender, options);
+        emit Vote(id, voter, options);
+        emit VoteCreated(id, optionVotes, indexes, msg.sender, proposals[id].options);
+
     }
 
     function voteProposalBySingleChoice(
@@ -235,6 +242,9 @@ contract Dao is ReentrancyGuard {
 
         proposals[id].voters.push(voter);
 
+        emit Vote(id, voter, proposals[id].options);
+        emit Testing(id, msg.sender);
+        emit VoteCreated(id, optionVotes, optionIndex, msg.sender, proposals[id].options);
         // proposals[id].voters.push(msg.sender);
     }
 
@@ -278,11 +288,14 @@ contract Dao is ReentrancyGuard {
         proposals[id].voters.push(voter);
         
 
-        emit QuadraticVote(id, msg.sender, options);
+        emit Vote(id, voter, options);
+        emit VoteCreated(id, votingPower, indexes, msg.sender, proposals[id].options); 
+
     }
 
     function getTotalVotingPower(uint256[] memory votingPower)
         internal
+        pure
         returns (uint256 totalVotingPower)
     {
         for (uint256 i = 0; i < votingPower.length; i++) {
