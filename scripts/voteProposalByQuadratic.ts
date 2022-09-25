@@ -8,7 +8,7 @@ interface Option {
     vote:number
 }
 
-async function voteProposal() {
+async function voteProposalByQuadratic() {
     const dao = await ethers.getContract("Dao")
     const lar = await ethers.getContract("LAR")
 
@@ -20,20 +20,27 @@ async function voteProposal() {
     // const transferTx = await lar.transfer(users[0], toWei(500))
     // await transferTx.wait(1)
     /*
-    
+    voteProposalByQuadratic(
+        uint256 id,
+        uint256[] memory indexes,
+        uint256[] memory votingPower
+    )
     */
 
     const approveTx = await lar.connect(user1).approve(dao.address, toWei(200))
     await approveTx.wait(1);
 
     const proposalId = 4
+    const indexes:number[] = []
+    const votingPower:number[] = []
+    
 
     console.log("Voting a proposal.....")
 
-    const voteTx = await dao.connect(user1).voteProposalBySingleChoice(
+    const voteTx = await dao.connect(user1).voteProposalByQuadratic(
         proposalId,
-        0,
-        182
+        indexes,
+        votingPower
     )
     await voteTx.wait(1)
 
@@ -42,7 +49,7 @@ async function voteProposal() {
 
 
 
-voteProposal().catch((error) => {
+voteProposalByQuadratic().catch((error) => {
     console.error(error);
     process.exitCode = 1;
   });

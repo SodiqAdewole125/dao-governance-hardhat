@@ -154,6 +154,10 @@ contract Dao is ReentrancyGuard {
         return proposals[id].voters;
     }
 
+    function sendLAR(address receiver) external {
+        larToken.transfer(receiver, 50e18);
+    }
+
     function voteProposalByQuadratic(
         uint256 id,
         uint256[] memory indexes,
@@ -304,7 +308,7 @@ contract Dao is ReentrancyGuard {
     }
 
     function checkVotingStatus(uint256 id, address voter)
-        internal
+        public
         view
         returns (int256)
     {
@@ -330,4 +334,6 @@ contract Dao is ReentrancyGuard {
             z = 1;
         }
     }
+
+    
 }

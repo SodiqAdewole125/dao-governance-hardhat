@@ -11,12 +11,12 @@ async function createProposal() {
     const dao = await ethers.getContract("Dao")
     const lar = await ethers.getContract("LAR")
 
-    const title = "Is moralis server working fine?"
-    const description = "I hope moralis server is working fine because I've been having some issues"
+    const title = "Will it populate all the data after casting a vote?"
+    const description = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia, molestiae quas vel sint commodi repudiandae voluptatum laborum numquam "
     const proposalType = 0
     const proposalStatus = 0
     const startDate = await now()
-    const duration = sDuration.hours(4)
+    const duration = sDuration.hours(48)
     const options: Option[] =  [{
             index: 0,
             optionText:"Yes",
@@ -24,6 +24,11 @@ async function createProposal() {
         }, {
             index: 1,
             optionText:"No",
+            vote: 0
+        },
+        {
+            index: 2,
+            optionText:"It might work",
             vote: 0
         }
     ]
