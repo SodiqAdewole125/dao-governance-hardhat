@@ -11,7 +11,7 @@ It is deployed on the Mumbai testnet.
     * Quadratic Voting System: A proposal created with this voting system can allow users to spread their votes across multiple options and their vote equals the square root of their voting power. That is, if you spread 25 LAR Tokens on an option, the vote you casted will equal 5 votes
   
     * Weighted Voting system: This kind of voting system allows users to vote multiple options. So, they can show the level of support or opposition they have for the options they are voting for.
-4. You can check up more features implemented by the platform [here](https://larry-dao-governance.vercel.app/)
+
 
 # Technologies
 1. **Open Zeppelin**: The contract uses IERC20 of OpenZeppelin create an instance of LAR token.
@@ -28,9 +28,9 @@ It is deployed on the Mumbai testnet.
  # Developer
  Let's Connect! 👋 👋 
  ```
- Akintayo Lanre - 
-    Email - akintayolanre2019@gmail.com
-    Linkedin - https://www.linkedin.com/in/akintayo-lanre-b6462b238/
+ Adewole Sodiq - 
+    Email - adewolesodiq7@gmail.com
+    X account - https://x.com/0xkarayel
  ```
 
 
